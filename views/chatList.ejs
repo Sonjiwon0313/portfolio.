@@ -1,0 +1,45 @@
+<% include ./header.ejs %>
+<div class="container col-lg-12 col-md-12 col-sm-12">
+    <div class="chat-container">
+        <div class="chat-header">
+          <button id="close" class="header-btn"></button>
+          <button id="minimize" class="header-btn"></button>
+          <button id="maximize" class="header-btn"></button>
+
+          <span id="username">채팅</span>
+        </div>
+
+        <div class="text-box">
+          <div>
+            <%for(let key in sessionUsers){%>
+              <div class="chat-header" data-id="<%=sessionUsers[key].username%>" data-roomname="">
+                <img id="profile-pic" src="/images/profilePhoto.jpeg" width="50" height="50">
+                <span name="displayname"><%=sessionUsers[key].displayname%></span>
+              </div>
+              <hr style="margin:5px 0;" />
+            <%}%>
+          </div>
+        </div>
+        <form id="submitForm" method="post" action="/chat/room">
+          <input type="hidden" name="sendname" value="<%=myinfo.username%>">
+          <input type="hidden" name="receivename" value="">
+          <input type="hidden" name="displayname" value="">
+          <input type="hidden" name="roomname" value="">
+        </form>
+      </div>
+</div>
+<script>
+  $(document).ready(function(){
+    var socket = io.connect();
+    socket.on('login',function(data){
+      location.reload();
+    });
+    $(".chat-header").click(function(){
+      $("#submitForm input[name='receivename']").val($(this).data("id"));
+      $("#submitForm input[name='displayname']").val($(this).find("span[name='displayname']").text());
+      $("#submitForm input[name='roomname']").val($(this).data("roomname"));
+      $("#submitForm").submit();
+    })
+  })
+</script>
+<% include ./footer.ejs%>

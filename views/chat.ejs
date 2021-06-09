@@ -1,0 +1,57 @@
+<% include ./header.ejs %>
+<div class="container col-lg-12 col-md-12 col-sm-12">
+    <div class="chat-container">
+        <div class="chat-header">
+          <button id="close" class="header-btn"></button>
+          <button id="minimize" class="header-btn"></button>
+          <button id="maximize" class="header-btn"></button>
+
+          <img id="profile-pic" src="/images/profilePhoto.jpeg" width="50" height="50">
+          <span id="username"><%=user.displayname%></span>
+        </div>
+
+        <div class="chatbox"></div>
+
+        <div class="text-box">
+          <textarea placeholder="대화내용이 들어갑니다."></textarea>
+          <button id="send">전송</button>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+</div>
+<script>
+window.onload = function(){
+  var socket = io.connect();
+  var roomName = "<%=user.roomname%>";
+  socket.emit('join',roomName);
+  $('#send').click(function(){
+    if($('textarea').val()){
+      socket.emit('sendMsg',{
+        username: "테스트",
+        message: $('textarea').val(),
+        date: new Date().toUTCString()
+      });
+      $('.chatbox').append('<div class=\'my-bubble bubble\'>'+ $('textarea').val() +'</div>');
+      $('textarea').val('');
+    }else{
+      alert('입력해주세요!');
+    }
+    }); 
+
+  socket.on('receiveMsg',function(data){
+    $('.chatbox').append('<div class=\'friend-bubble bubble\'>'+ data.message +'</div>');
+  });
+  }
+</script>
+
+
+<!-- $('#send').on('click',isBlank);
+function isBlank(){
+  if($('textarea').val() === ''){
+    alert('메시지 입력');
+  }else{
+    $('.chatbox').append('<div class=\'my-bubble bubble\'>'+ $('textarea').val() +'</div>');
+    $('textarea').val('');
+  }
+} -->
+<% include ./footer.ejs%>

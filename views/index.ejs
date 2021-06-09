@@ -1,0 +1,83 @@
+<% include ./header.ejs %>
+<div class="container col-lg-12 col-md-12 col-sm-12">
+    <div class="login-form">
+      <form name="form1" action="" method="post">
+        <input oninput="confirm()" type="text" name="username" id="username" class="text-field" placeholder="아이디"><br>
+        <input oninput="confirm()" type="password" name="password" id="password" class="text-field" placeholder="비밀번호"><br>
+        <input type="button" value="로그인" id="login-btn">
+        <input type="button" value="회원가입" id="register-btn" onclick="location.href='/register'">
+      </form>
+      <div class="links">
+        <a href="/password" id="p">비밀번호를 잊어버리셨나요?</a>
+      </div>
+    </div>
+</div>
+<script>
+  var socket = io.connect();
+  function confirm(){
+      if($('#password').val() == "" || $('#username').val() == ""){
+        $("#login-btn").css({"background-color":"#9B9B9B"});
+        $("#login-btn").attr("disabled",true);
+      }else{
+        $("#login-btn").css({"background-color":"#1BBC9B"});
+        $("#login-btn").attr("disabled",false);
+      }
+    }
+  function confirm2(){
+    if($('#check-input').val() == ""){
+      $("#check-btn").css({"backgroundColor":"#9B9B9B"});
+      document.getElementById("check-btn").style.backgroundColor="#9B9B9B";
+      document.getElementById("check-btn").disabled = true;
+    }else{
+      document.getElementById("check-btn").style.backgroundColor="#1BBC9B";
+      document.getElementById("check-btn").disabled = false;
+    }
+    }
+  $("#login-btn").click(function(){
+    $.ajax({
+      type:"POST",
+      url:"/login",
+      data:{
+        "username":$("#username").val(),
+        "password":$("#password").val()
+      },
+      success:function(data){
+        if(!data.isSuccess){
+          alert(data.message);
+          return;
+        }
+        socket.emit('login',"");
+        location.href="/chat";
+      },
+      fail:function(){
+        alert("서버에 문제가 생겼습니다.\n잠시 후 다시 시도해주세요.")
+      }
+    })
+  });
+  $("#check-btn").click(function(){
+    $.ajax({
+      type:"POST",
+      url:"/register/idcheck",
+      data:$("#form2").serialize(),
+      success:function(data){
+        console.log(data);
+        if(data){
+          alert("가입이 불가능합니다.")
+        }else{
+          alert("가입이 가능합니다.")
+        }
+      },
+      fail:function(){
+        console.log("통신실패");
+      },
+      beforeSend:function(){
+        console.log("데이터보내기 전");
+      },
+      complete:function(){
+        console.log("ajax완료");
+      }
+    })
+  });
+  
+</script>
+<% include ./footer.ejs%>
